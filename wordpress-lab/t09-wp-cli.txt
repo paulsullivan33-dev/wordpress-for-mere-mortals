@@ -1,0 +1,50 @@
+WP-CLI (official phar, SHA-256 verified against the build project's published
+sum before first use) doing real work against the lab site. WP-CLI refuses
+to run as root without --allow-root; the lab wrapper adds it, and says so.
+
+$ wp core version
+7.1.4
+
+$ wp core verify-checksums
+Success: WordPress installation verifies against checksums.
+(every installed core file re-hashed and compared with the official
+checksums API at api.wordpress.org)
+
+$ wp theme list
+name	status	update	version	update_version	auto_update
+twentytwentyfive	active	none	1.5		off
+twentytwentyfour	inactive	none	1.6		off
+twentytwentythree	inactive	none	1.7		off
+
+$ wp rewrite structure "/%postname%/"
+Success: Rewrite structure set.
+
+$ wp theme activate twentytwentyfour
+Success: Switched to 'Twenty Twenty-Four' theme.
+
+...and the switch is visible in what the server actually serves:
+
+$ curl -s http://127.0.0.1:18080/ | grep -o "wp-content/themes/[a-z]*" | sort -u
+wp-content/themes/twentytwentyfive          (before)
+wp-content/themes/twentytwentyfour          (after)
+
+$ wp plugin activate hello akismet
+Plugin 'hello' activated.
+Plugin 'akismet' activated.
+Success: Activated 2 of 2 plugins.
+$ wp plugin list
+name	status	update	version	update_version	auto_update
+akismet	active	none	5.7.2		off
+hello	active	none	1.7.2		off
+$ wp plugin deactivate hello
+Plugin 'hello' deactivated.
+Success: Deactivated 1 of 1 plugins.
+
+One wart, kept verbatim: creating the application password printed a PHP
+fatal from a WP-CLI subprocess that picked up a PHP without the Phar
+extension in this extracted-package lab — and then the command completed
+and the password worked. On a normally installed system this does not
+happen; it is recorded here because the lab's PHP is assembled by hand.
+
+PHP Fatal error:  Uncaught Error: Class "Phar" not found in
+/home/hatch/workspace/wordpress-labwork/dl/wp-cli.phar:3

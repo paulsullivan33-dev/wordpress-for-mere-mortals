@@ -1,0 +1,10 @@
+$ curl -s -o /dev/null -w "%{http_code} -> %{redirect_url}" http://127.0.0.1:18080/
+302 -> http://127.0.0.1:18080/wp-admin/install.php
+
+$ curl -s http://127.0.0.1:18080/wp-admin/install.php | grep -o "<title>[^<]*</title>"
+<title>WordPress &rsaquo; Installation</title>
+
+$ curl -s -X POST --data-urlencode "language=en_US" ".../install.php?step=1" | grep -o "name=\"[a-z_0-9]*\"" | sort -u
+name="admin_email" name="admin_password" name="admin_password2" name="blog_public" name="language" name="pw_weak" name="robots" name="user_name" name="viewport" name="weblog_title" 
+(the setup form: weblog_title, user_name, admin_password, admin_password2,
+ admin_email, blog_public — the whole "five-minute install" is this one form)

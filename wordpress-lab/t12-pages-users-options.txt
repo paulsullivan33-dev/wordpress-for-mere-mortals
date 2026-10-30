@@ -1,0 +1,23 @@
+Pages, a second user, and a setting — the small jobs, all run:
+
+$ wp post create --post_type=page --post_title="About the Weekly" \
+    --post_content="The Millbrook Weekly is a fictional village newsletter ..." \
+    --post_status=publish --porcelain
+7
+$ curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:18080/about-the-weekly/
+200
+$ curl -s http://127.0.0.1:18080/about-the-weekly/ | grep -c "fictional village newsletter"
+1
+
+$ wp user create pat_contributor pat@example.com --role=contributor \
+    --display_name="Pat Contributor" --user_pass="..."
+Success: Created user 2.
+$ wp user list --fields=ID,user_login,roles
+ID	user_login	roles
+1	millbrook_editor	administrator
+2	pat_contributor	contributor
+
+$ wp option update blogdescription "News from a fictional village"
+Success: Updated 'blogdescription' option.
+$ wp option get blogdescription
+News from a fictional village

@@ -1,0 +1,25 @@
+$ mariadb-install-db --defaults-file=mariadb/my.cnf --basedir=rootfs/usr --datadir=mariadb/data ...
+(system tables created; the sandbox also produced this honest warning:)
+2026-10-30 13:22:48 0 [Warning] mariadbd: io_uring_queue_init() failed with EPERM:
+sysctl kernel.io_uring_disabled has the value 2 ... MariaDB falls back to ordinary
+file I/O. The first attempt, before the lab defaults file existed, read the HOST's
+/etc/mysql config and aborted on its provider_* variables — config isolation is
+the lab's first MariaDB lesson, and it is in the troubleshooting chapter.
+
+$ mariadbd --defaults-file=mariadb/my.cnf --skip-networking --socket=mariadb/run/mariadb.sock ... &
+$ mariadb --socket=mariadb/run/mariadb.sock -u root -e "SELECT VERSION(); SHOW DATABASES;"
+VERSION()
+10.11.14-MariaDB-0ubuntu0.24.04.1
+Database
+information_schema
+millbrook_wp
+mysql
+performance_schema
+sys
+$ mariadb --socket=... -u root -e "CREATE DATABASE millbrook_wp ...; CREATE USER 'wp_millbrook'@'localhost' ...; GRANT ALL ON millbrook_wp.* ..."
+$ mariadb --socket=... -u wp_millbrook -p... -e "SELECT CURRENT_USER(); SHOW DATABASES;"
+CURRENT_USER()
+wp_millbrook@localhost
+Database
+information_schema
+millbrook_wp

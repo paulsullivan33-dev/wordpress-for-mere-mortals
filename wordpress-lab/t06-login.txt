@@ -1,0 +1,23 @@
+$ curl -s -c cookies.txt http://127.0.0.1:18080/wp-login.php        (collect the test cookie)
+$ curl -s -b cookies.txt -c cookies.txt \
+    --data-urlencode "log=millbrook_editor" \
+    --data-urlencode "pwd=Millbrook-Press-2026!" \
+    --data-urlencode "testcookie=1" \
+    --data-urlencode "redirect_to=/wp-admin/" \
+    http://127.0.0.1:18080/wp-login.php
+POST wp-login.php -> 302 -> http://127.0.0.1:18080/wp-admin/
+
+$ grep -o "wordpress_logged_in_[a-f0-9]*" cookies.txt | head -1
+wordpress_logged_in_c8ff781bf277f1376b21a5878b85b45d
+
+$ curl -s -b cookies.txt http://127.0.0.1:18080/wp-admin/
+GET /wp-admin/ -> 200
+(the dashboard HTML greets the user: "Howdy, millbrook_editor")
+
+And the failure, kept verbatim — the same form with a wrong password:
+
+$ curl -s -b cookies2.txt --data-urlencode "log=millbrook_editor" \
+    --data-urlencode "pwd=wrong-password" --data-urlencode "testcookie=1" \
+    http://127.0.0.1:18080/wp-login.php | grep -o "<strong>Error:</strong>.*"
+<strong>Error:</strong> The password you entered for the username
+<strong>millbrook_editor</strong> is incorrect. ...

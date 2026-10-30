@@ -1,0 +1,21 @@
+Updates and backup, both run for real:
+
+$ wp core check-update
+Success: WordPress is at the latest version.
+(the check really does talk to api.wordpress.org from this sandbox)
+
+$ wp plugin list --fields=name,status,update,version
+name	status	update	version
+akismet	active	none	5.7.2
+hello	inactive	none	1.7.2
+
+$ wp db export backups/millbrook-2026-10-30.sql
+Success: Exported to 'backups/millbrook-2026-10-30.sql'.
+$ tar -czf backups/wp-content-2026-10-30.tar.gz -C wp wp-content
+$ ls -la backups/
+-rw-rw---- 1 105601 millbrook-2026-10-30.sql
+-rw-rw---- 1 13323162 wp-content-2026-10-30.tar.gz
+$ grep -c "Village Fête" backups/millbrook-2026-10-30.sql
+1
+(the exported database really does contain the published post — a backup
+you have not read back is a hope, not a backup)

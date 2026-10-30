@@ -1,0 +1,49 @@
+Publishing through the REST API, with an application password made by WP-CLI:
+
+$ wp user application-password create millbrook_editor "lab curl" --porcelain
+<the application password printed at creation; redacted here>
+
+The first attempt, before the fix, failed — kept verbatim:
+
+$ curl -s -u "millbrook_editor:$APP" -X POST --data-urlencode "title=..." \
+    --data-urlencode "status=publish" http://127.0.0.1:18080/wp-json/wp/v2/posts
+POST /wp-json/wp/v2/posts -> 401
+{"code":"rest_cannot_create","message":"Sorry, you are not allowed to create
+posts as this user.","data":{"status":401}}
+
+The password existed and was correct; WordPress was refusing to honour
+application passwords at all. On a site served over plain HTTP, application
+passwords only work when WordPress knows the site is a local/development
+one. The fix is one line in wp-config.php:
+
+    define( 'WP_ENVIRONMENT_TYPE', 'local' );
+
+After which the same password identifies the user immediately:
+
+$ curl -s -u "millbrook_editor:$APP" http://127.0.0.1:18080/wp-json/wp/v2/users/me
+{"id":1,"name":"millbrook_editor","url":"http:\/\/127.0.0.1:18080", ... }
+
+And the publish itself:
+
+$ curl -s -u "millbrook_editor:$APP" -X POST \
+    --data-urlencode "title=Village Fête Returns to the Green This Saturday" \
+    --data-urlencode "content=<p>The village fête returns to the green ..." \
+    --data-urlencode "status=publish" \
+    http://127.0.0.1:18080/wp-json/wp/v2/posts
+POST /wp-json/wp/v2/posts -> 201
+id: 5
+slug: village-fete-returns-to-the-green-this-saturday
+status: publish
+link: http://127.0.0.1:18080/village-fete-returns-to-the-green-this-saturday/
+
+The proofs, three ways:
+
+$ curl -s http://127.0.0.1:18080/ | grep -c "Village Fête Returns to the Green"
+1
+$ curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:18080/village-fete-returns-to-the-green-this-saturday/
+200
+$ curl -s http://127.0.0.1:18080/village-fete-returns-to-the-green-this-saturday/ | grep -c "brass band"
+1
+$ curl -s http://127.0.0.1:18080/wp-json/wp/v2/posts        (no password — the public read)
+5  village-fete-returns-to-the-green-this-saturday  publish
+1  hello-world  publish

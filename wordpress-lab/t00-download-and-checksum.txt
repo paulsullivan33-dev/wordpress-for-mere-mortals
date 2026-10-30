@@ -1,0 +1,14 @@
+$ curl -sSL -o wordpress.tar.gz https://wordpress.org/latest.tar.gz
+$ sha256sum wordpress.tar.gz
+881e53a4681ff2cd911651b11cccdede5ae477ddf0765af5d6a1a8b219a1d835  dl/wordpress.tar.gz
+$ md5sum wordpress.tar.gz
+e3ab64c0de73fe22c0e482c00fa9298c  dl/wordpress.tar.gz
+$ curl -sSL https://wordpress.org/wordpress-7.1.4.tar.gz.md5  (published MD5, from wordpress.org)
+e3ab64c0de73fe22c0e482c00fa9298c
+$ curl -sSL https://wordpress.org/latest.tar.gz.sha256
+404 — wordpress.org serves a "Page not found" page for that URL; there is no published
+SHA-256 for the "latest" alias. The published MD5 above is the checksum wordpress.org
+offers for this release, and WP-CLI later re-verifies every core file against the
+official checksums API (see the WP-CLI transcript).
+$ grep "wp_version =" wordpress/wp-includes/version.php
+$wp_version = '7.1.4';

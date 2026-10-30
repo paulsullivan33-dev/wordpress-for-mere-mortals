@@ -1,0 +1,16 @@
+A draft, made in WP-CLI, and the three places it must and must not appear:
+
+$ wp post create --post_title="Harvest Supper Tickets Go On Sale Monday" \
+    --post_content="Tickets for the harvest supper go on sale ..." \
+    --post_status=draft --porcelain
+6
+
+$ curl -s http://127.0.0.1:18080/ | grep -c "Harvest Supper"
+0
+$ curl -s "http://127.0.0.1:18080/wp-json/wp/v2/posts?per_page=50" | grep -c "Harvest Supper"
+0
+$ wp post list --post_status=draft --fields=ID,post_title,post_status
+ID	post_title	post_status
+6	Harvest Supper Tickets Go On Sale Monday	draft
+
+Invisible to readers and to the public API; present where the editor works.

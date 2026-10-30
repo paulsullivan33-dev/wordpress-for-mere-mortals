@@ -1,0 +1,60 @@
+$ php -v    (extracted Ubuntu php8.3 packages, run with the lab php.ini)
+PHP 8.3.6 (cli) (built: Oct 19 2026 15:16:58) (NTS)
+Copyright (c) The PHP Group
+Zend Engine v4.3.6, Copyright (c) Zend Technologies
+    with Zend OPcache v8.3.6, Copyright (c), by Zend Technologies
+
+$ php -m
+[PHP Modules]
+bcmath
+Core
+ctype
+curl
+date
+dom
+exif
+fileinfo
+filter
+gd
+gettext
+hash
+iconv
+intl
+json
+libxml
+mbstring
+mysqli
+mysqlnd
+openssl
+pcntl
+pcre
+PDO
+pdo_mysql
+pdo_sqlite
+Phar
+posix
+random
+Reflection
+session
+SimpleXML
+sockets
+sodium
+SPL
+sqlite3
+standard
+tokenizer
+xml
+xmlreader
+xmlwriter
+Zend OPcache
+zip
+zlib
+
+[Zend Modules]
+Zend OPcache
+
+
+Note: the first attempt loaded the HOST machine's /etc/php/8.3/cli/conf.d as well and
+PHP complained that half the modules were "already loaded". The fix in the lab
+wrapper is PHP_INI_SCAN_DIR pointed at an empty lab directory, so only the lab's
+own php.ini speaks.

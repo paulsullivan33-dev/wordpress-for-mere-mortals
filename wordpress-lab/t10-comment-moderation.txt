@@ -1,0 +1,26 @@
+A reader comment, submitted the way a browser submits it — no login:
+
+$ curl -s -X POST \
+    --data-urlencode "comment_post_ID=5" \
+    --data-urlencode "author=Alex Rivers" \
+    --data-urlencode "email=alex@example.com" \
+    --data-urlencode "comment=Lovely news — will the cake stall need extra tables this year?" \
+    http://127.0.0.1:18080/wp-comments-post.php
+POST wp-comments-post.php -> 302 ->
+http://127.0.0.1:18080/village-fete-returns-to-the-green-this-saturday/?unapproved=2&moderation-hash=59ee...#comment-2
+
+The redirect itself says the comment is unapproved. On the public page:
+
+$ curl -s http://127.0.0.1:18080/village-fete-returns-to-the-green-this-saturday/ | grep -c "cake stall need extra tables"
+0
+
+$ wp comment list --status=hold --fields=comment_ID,comment_author,comment_approved
+comment_ID	comment_author	comment_approved
+2	Alex Rivers	0
+
+Approval, and the comment becomes public:
+
+$ wp comment approve 2
+Success: Approved comment 2.
+$ curl -s http://127.0.0.1:18080/village-fete-returns-to-the-green-this-saturday/ | grep -c "cake stall need extra tables"
+1
